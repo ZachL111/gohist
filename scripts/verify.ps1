@@ -61,3 +61,9 @@ foreach ($pathPattern in $knownPaths) {
 go test ./...
 
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-gohist-detail.ps1
+
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-gohist-properties.ps1
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-gohist-golden.ps1
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

@@ -1,0 +1,17 @@
+{
+  "repo": "gohist",
+  "thresholds": {
+    "signal": 3,
+    "slack": 1,
+    "confidence": 2,
+    "drag": 4,
+    "ship": 207,
+    "watch": 119
+  },
+  "terms": [
+    "span volume",
+    "latency skew",
+    "signal loss",
+    "incident shape"
+  ]
+}
