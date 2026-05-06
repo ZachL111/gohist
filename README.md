@@ -1,69 +1,40 @@
 # gohist
 
-`gohist` packages a practical observability exercise in Go. The emphasis is on deterministic behavior, a small public API, and examples that explain the tradeoffs.
+`gohist` explores observability with a small Go codebase and local fixtures. The technical goal is to implement mergeable log-scale histograms and percentile fixtures.
 
-## How I Read Gohist
+## Why I Keep It Small
 
-The useful thing to inspect here is how the same score rule is represented in code, metadata, and examples. If those three pieces disagree, the audit script should make the drift visible.
+The point is to make a small domain rule concrete enough that a reader can change it and immediately see what broke.
 
-## Problem Shape
+## Gohist Review Notes
 
-The repository exists to keep a technical idea small enough to reason about. The implementation avoids external dependencies where possible, then uses fixtures to make changes easy to review.
+`recovery` and `baseline` are the cases worth reading first. They show the optimistic and cautious ends of the fixture.
 
-## Scenario Walkthrough
+## Included Behavior
 
-The extended cases are not random smoke tests. `degraded` keeps pressure on the review path, while `recovery` shows the model when capacity and weight are strong enough to clear the threshold.
+- `fixtures/domain_review.csv` adds cases for span volume and latency skew.
+- `metadata/domain-review.json` records the same cases in structured form.
+- `config/review-profile.json` captures the read order and the two review questions.
+- `examples/gohist-walkthrough.md` walks through the case spread.
+- The Go code includes a review path for `incident shape` and `span volume`.
+- `docs/field-notes.md` explains the strongest and weakest cases.
 
 ## Internal Model
 
-The project is organized around a compact model rather than a large framework. Inputs are scored, classified, and checked against golden fixtures. The constants live in code and are mirrored in metadata so documentation drift is easy to catch. The Go layout uses small packages and table-oriented tests so the behavior stays easy to follow.
+The core code exposes a scoring path and the added review layer uses `signal`, `slack`, `drag`, and `confidence`. The domain terms are `span volume`, `latency skew`, `signal loss`, and `incident shape`.
 
-## Main Behaviors
+The added Go path is deliberately direct, with fixtures doing most of the explaining.
 
-- Models span data with deterministic scoring and explicit review decisions.
-- Uses fixture data to keep log shape changes visible in code review.
-- Includes extended examples for latency summaries, including `recovery` and `degraded`.
-- Documents incident slices tradeoffs in `docs/operations.md`.
-- Runs locally with a single verification command and no external credentials.
-
-## How To Run It
+## Try It Locally
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1
 ```
 
-This runs the language-level build or test path against the compact fixture set.
-
 ## Validation
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/audit.ps1
-```
+The verifier is intentionally local. It should fail if the fixture score math, lane assignment, or language-specific test drifts.
 
-The audit command checks repository structure and README constraints before it delegates to the verifier.
+## Scope
 
-## Repository Map
-
-- `policy`: Go package with the core model
-- `cmd`: small command entry point
-- `fixtures`: compact golden scenarios
-- `examples`: expanded scenario set
-- `metadata`: project constants and verification metadata
-- `docs`: operations and extension notes
-- `scripts`: local verification and audit commands
-- `go.mod`: Go module metadata
-
-## Follow-Up Work
-
-- Add malformed input fixtures so the failure path is as visible as the happy path.
-- Split the scoring constants into a typed configuration object and validate it before use.
-- Add a comparison mode that shows how decisions change when one signal is adjusted.
-- Add one more observability fixture that focuses on a malformed or borderline input.
-
-## Known Edges
-
-The examples cover useful edges, not every edge. A larger version would add malformed-input tests, richer reports, and deeper domain parsers.
-
-## Run It Locally
-
-The only required setup is the local Go toolchain. After cloning, stay in the repo root so fixture paths resolve correctly.
+The fixture set is small enough to audit by hand. The next useful expansion is malformed input coverage, not extra surface area.
